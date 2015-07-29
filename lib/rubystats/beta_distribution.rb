@@ -85,5 +85,25 @@ module Rubystats
       end
     end
 
+    # From http://www.xycoon.com/beta_randomnumbers.htm
+    # Let Gam(1,a) ~ ln CartProduct(1,a) U(0,1)
+    # Let Gam(1,b) ~ ln CartProduct(1,b) U(0,1)
+    # Then Beta(a,b) ~ Gam(1,a)/(Gam(1,a)+Gam(1,b))
+
+    def get_rng # p and q must be integers
+      p_int, q_int = p.to_i, q.to_i
+      raise ArgumentError, "P's and Q's must be integers for this random number generator." if p_int!=p||q_int!=q
+      raise ArgumentError, "P's and Q's must be greater than 1 for this random number generator." if p_int < 1 || q_int < 1
+      gamma_p = gamma_approx(p_int)
+      gamma_q = gamma_approx(q_int)
+      return gamma_p/(gamma_p+gamma_q)
+    end
+
+    private
+
+    def gamma_approx(x)
+      Math.log(Array(1..x).inject(1){|cart_prod, v| cart_prod*rand})
+    end
+
   end
 end
